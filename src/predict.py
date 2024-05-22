@@ -33,10 +33,10 @@ model = load_model(model_path).to(device)
 print("Model loaded from", model_path)
 
 # Get sequence
-it = 2
+it = 0
 sequence = data[it]
 correct_output = targets[it]
-
+ 
 # Make predictions
 threshold = 0.5
 predictions, binary_predictions = predict(model, sequence, threshold)
@@ -45,6 +45,7 @@ plt.figure(figsize=(15, 5))
 sequence_line, = plt.plot(sequence, label='Sequence')
 plt.xlabel('Time Step')
 plt.ylabel('Sensor Value')
+plt.ylim(0, 1)
 plt.title('Sequence with Predicted Peaks')
 
 # Add vertical lines where predictions are 1
