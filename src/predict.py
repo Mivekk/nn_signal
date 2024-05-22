@@ -5,7 +5,6 @@ from matplotlib.lines import Line2D
 from model import LSTMModel
 
 from load_data import data, targets
-from evaluate import print_evaluation_metrics
 
 def load_model(model_path):
     model = LSTMModel()
@@ -16,30 +15,31 @@ def load_model(model_path):
 def predict(model, sequence, threshold=0.5):
     model.eval()
     with torch.no_grad():
-        sequence = torch.tensor(sequence, dtype=torch.float32).unsqueeze(0).unsqueeze(-1)  # (1, seq_len, 1)
+        sequence = torch.tensor(sequence, dtype=torch.float32).unsqueeze(0).unsqueeze(-1).to(device)  # (1, seq_len, 1)
         outputs = model(sequence)
         predictions = outputs.squeeze().cpu().numpy()
         binary_predictions = (predictions > threshold).astype(int)  # Convert to binary
         return predictions, binary_predictions
 
+# Check for CUDA
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+print(f'Using device: {device}')
+
 # Path to the saved model
 model_path = 'lstm_model.pth'
 
 # Load the model
-model = load_model(model_path)
+model = load_model(model_path).to(device)
 print("Model loaded from", model_path)
 
 # Get sequence
-it = 5
+it = 2
 sequence = data[it]
 correct_output = targets[it]
 
 # Make predictions
 threshold = 0.5
 predictions, binary_predictions = predict(model, sequence, threshold)
-print_evaluation_metrics(predictions, correct_output, threshold)
-
-print(f"Correct: {sum(correct_output)} Predicted: {sum(binary_predictions)}")
 
 plt.figure(figsize=(15, 5))
 sequence_line, = plt.plot(sequence, label='Sequence')
