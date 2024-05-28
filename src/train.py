@@ -6,7 +6,7 @@ import torch.optim as optim
 import matplotlib.pyplot as plt
 import pickle
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+from sklearn.metrics import precision_score, recall_score, f1_score
 
 from model import LSTMModel, hidden_size, num_layers
 from load_data import data, targets
@@ -119,7 +119,7 @@ def train_model(model, train_loader, val_loader, criterion, optimizer, num_epoch
 
     return train_losses, val_losses
 
-train_losses, val_losses = train_model(model, train_dataloader, val_dataloader, criterion, optimizer, num_epochs=50)
+train_losses, val_losses = train_model(model, train_dataloader, val_dataloader, criterion, optimizer, num_epochs=100)
 
 # Plot the train and validation loss
 plt.figure(figsize=(10, 5))

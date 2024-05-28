@@ -43,8 +43,6 @@ for data, targets in zip(val_data, val_targets):
     threshold = 0.5
     predictions, binary_predictions = predict(model, sequence, threshold)
 
-    print(f"shape sequence: {1 in correct_output}")
-
     plt.figure(figsize=(15, 5))
 
     # Plot each column of the sequence

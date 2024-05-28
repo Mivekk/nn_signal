@@ -3,6 +3,7 @@ import json
 import requests
 import numpy as np
 from bs4 import BeautifulSoup
+from scipy.signal import savgol_filter
 from urllib.parse import urljoin
 
 def download_json_files(url, local_dir):
@@ -53,6 +54,9 @@ def get_json_files_content(local_dir):
 
 json_contents = get_json_files_content(local_dir)
 
+window_size = 51
+poly_order = 3
+
 def extract_interior_exterior_peaks(json_contents):
     interior_elements = []
     exterior_elements = []
@@ -64,7 +68,10 @@ def extract_interior_exterior_peaks(json_contents):
             peaks_elements.append(entry["peaks"]["serie"])
             
     # Stack interior and exterior to shape (num_entries, sequence_length, num_features)
-    combined_elements = np.stack([interior_elements, exterior_elements], axis=-1)
+    smoothed_interior_elements = savgol_filter(interior_elements, window_length=window_size, polyorder=poly_order)
+    smoothed_exterior_elements = savgol_filter(exterior_elements, window_length=window_size, polyorder=poly_order)
+
+    combined_elements = np.stack([smoothed_interior_elements, smoothed_exterior_elements], axis=-1)
     
     return combined_elements, np.array(peaks_elements)
 
