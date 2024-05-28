@@ -4,6 +4,7 @@ from torch.utils.data import Dataset, DataLoader
 import torch.nn as nn
 import torch.optim as optim
 import matplotlib.pyplot as plt
+import pickle
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 
@@ -61,7 +62,7 @@ def train_one_epoch(model, dataloader, criterion, optimizer, grad_clip=1.0):
     model.train()
     for data, targets in dataloader:
         # Add feature dimension (seq_len, batch_size, input_size)
-        data, targets = data.to(device).unsqueeze(-1), targets.to(device).unsqueeze(-1)
+        data, targets = data.to(device), targets.to(device).unsqueeze(-1)
         
         outputs = model(data)
         loss = criterion(outputs, targets)
@@ -80,7 +81,7 @@ def validate_one_epoch(model, dataloader, criterion):
     val_predictions, val_actuals = [], []
     with torch.no_grad():
         for data, targets in dataloader:
-            data, targets = data.to(device).unsqueeze(-1), targets.to(device).unsqueeze(-1)
+            data, targets = data.to(device), targets.to(device).unsqueeze(-1)
             outputs = model(data)
             loss = criterion(outputs, targets)
             epoch_val_losses.append(loss.item())
@@ -118,7 +119,7 @@ def train_model(model, train_loader, val_loader, criterion, optimizer, num_epoch
 
     return train_losses, val_losses
 
-train_losses, val_losses = train_model(model, train_dataloader, val_dataloader, criterion, optimizer, num_epochs=10)
+train_losses, val_losses = train_model(model, train_dataloader, val_dataloader, criterion, optimizer, num_epochs=50)
 
 # Plot the train and validation loss
 plt.figure(figsize=(10, 5))
@@ -128,8 +129,13 @@ plt.xlabel('Epoch')
 plt.ylabel('Loss')
 plt.title(f'Train and Validation Loss Over Epochs\nHidden size: {hidden_size}, Number of layers: {num_layers}')
 plt.legend()
-plt.show()
+plt.savefig(f"hidden{hidden_size}_layers{num_layers}")
 
 model_path = "lstm_model.pth"
 torch.save(model.state_dict(), model_path)
 print("Model saved to", model_path)
+
+with open("val_data.pkl", "wb") as f:
+    pickle.dump((val_data, val_targets), f)
+
+plt.show()

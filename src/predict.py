@@ -1,10 +1,9 @@
 import torch
 import numpy as np
 import matplotlib.pyplot as plt
+import pickle
 from matplotlib.lines import Line2D
 from model import LSTMModel
-
-from load_data import data, targets
 
 def load_model(model_path):
     model = LSTMModel()
@@ -15,7 +14,7 @@ def load_model(model_path):
 def predict(model, sequence, threshold=0.5):
     model.eval()
     with torch.no_grad():
-        sequence = torch.tensor(sequence, dtype=torch.float32).unsqueeze(0).unsqueeze(-1).to(device)  # (1, seq_len, 1)
+        sequence = torch.tensor(sequence, dtype=torch.float32).unsqueeze(0).to(device)  # (1, seq_len, 2)
         outputs = model(sequence)
         predictions = outputs.squeeze().cpu().numpy()
         binary_predictions = (predictions > threshold).astype(int)  # Convert to binary
@@ -32,33 +31,48 @@ model_path = 'lstm_model.pth'
 model = load_model(model_path).to(device)
 print("Model loaded from", model_path)
 
+with open('val_data.pkl', 'rb') as f:
+    val_data, val_targets = pickle.load(f)
+
 # Get sequence
-it = 0
-sequence = data[it]
-correct_output = targets[it]
- 
-# Make predictions
-threshold = 0.5
-predictions, binary_predictions = predict(model, sequence, threshold)
-
-plt.figure(figsize=(15, 5))
-sequence_line, = plt.plot(sequence, label='Sequence')
-plt.xlabel('Time Step')
-plt.ylabel('Sensor Value')
-plt.ylim(0, 1)
-plt.title('Sequence with Predicted Peaks')
-
-# Add vertical lines where predictions are 1
-for i, pred in enumerate(binary_predictions):
-    if pred == 1:
-        plt.axvline(x=i, color='r', linestyle='--', alpha=1.0, lw=0.2)
+for data, targets in zip(val_data, val_targets):
+    sequence = data
+    correct_output = targets
     
-    if correct_output[i] == 1:
-        plt.axvline(x=i, color='g', linestyle='--', alpha=1.0, lw=5.0)
+    # Make predictions
+    threshold = 0.5
+    predictions, binary_predictions = predict(model, sequence, threshold)
 
-custom_lines = [sequence_line,
-                Line2D([0], [0], color='r', lw=2, linestyle='--', alpha=0.5),
-                Line2D([0], [0], color='g', lw=2, linestyle='--', alpha=1.0)]
+    print(f"shape sequence: {1 in correct_output}")
 
-plt.legend(custom_lines, ['Sequence', 'Predicted Peaks', 'True Peaks'])
-plt.show()
+    plt.figure(figsize=(15, 5))
+
+    # Plot each column of the sequence
+    sequence_lines = []
+    for col in range(sequence.shape[1]):
+        line, = plt.plot(sequence[:, col], label=f'Sequence Column {col+1}')
+        sequence_lines.append(line)
+
+    plt.xlabel('Time Step')
+    plt.ylabel('Sensor Value')
+    plt.ylim(0, 1)
+    plt.title('Sequence with Predicted Peaks')
+
+    # Add vertical lines where predictions are 1
+    for i, (pred, corr) in enumerate(zip(binary_predictions, correct_output)):
+        if pred == 1:
+            plt.axvline(x=i, color='r', linestyle='--', alpha=1.0, lw=0.2)
+        if corr == 1:
+            plt.axvline(x=i, color='g', linestyle='--', alpha=1.0, lw=5)
+
+    # Custom legend lines for the peaks
+    predicted_peaks_line = Line2D([0], [0], color='r', lw=2, linestyle='--', alpha=1.0)
+    true_peaks_line = Line2D([0], [0], color='g', lw=2, linestyle='--', alpha=1.0)
+
+    # Combine all legend handles and labels
+    handles = sequence_lines + [predicted_peaks_line, true_peaks_line]
+    labels = [f'Sequence Column {i+1}' for i in range(sequence.shape[1])] + ['Predicted Peaks', 'True Peaks']
+
+    # Create a single combined legend
+    plt.legend(handles, labels, loc='upper right')
+    plt.show()

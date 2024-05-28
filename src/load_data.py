@@ -34,6 +34,7 @@ def download_json_files(url, local_dir):
 # Usage
 url = 'http://titi.etsii.urjc.es/splendid/samples/'
 local_dir = './data/'
+print("Downloading json files...")
 download_json_files(url, local_dir)
 
 def get_json_files_content(local_dir):
@@ -52,14 +53,19 @@ def get_json_files_content(local_dir):
 
 json_contents = get_json_files_content(local_dir)
 
-def extract_mix_peaks(json_contents):
-    mix_elements = []
+def extract_interior_exterior_peaks(json_contents):
+    interior_elements = []
+    exterior_elements = []
     peaks_elements = []
     for file_content in json_contents:
         for entry in file_content:
-            mix_elements.append(entry["mix"])
+            interior_elements.append(entry["interior"])
+            exterior_elements.append(entry["exterior"])
             peaks_elements.append(entry["peaks"]["serie"])
             
-    return np.array(mix_elements), np.array(peaks_elements)
+    # Stack interior and exterior to shape (num_entries, sequence_length, num_features)
+    combined_elements = np.stack([interior_elements, exterior_elements], axis=-1)
+    
+    return combined_elements, np.array(peaks_elements)
 
-data, targets = extract_mix_peaks(json_contents)
+data, targets = extract_interior_exterior_peaks(json_contents)
