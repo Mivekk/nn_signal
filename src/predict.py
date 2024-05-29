@@ -5,9 +5,9 @@ import pickle
 from matplotlib.lines import Line2D
 from model import LSTMModel
 
-def load_model(model_path):
+def load_model(model_path, device):
     model = LSTMModel()
-    model.load_state_dict(torch.load(model_path))
+    model.load_state_dict(torch.load(model_path, map_location=torch.device(device)))
     model.eval()
     return model
 
@@ -25,10 +25,10 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print(f'Using device: {device}')
 
 # Path to the saved model
-model_path = 'lstm_model.pth'
+model_path = 'lstm_model_250_6.pth'
 
 # Load the model
-model = load_model(model_path).to(device)
+model = load_model(model_path, device).to(device)
 print("Model loaded from", model_path)
 
 with open('val_data.pkl', 'rb') as f:

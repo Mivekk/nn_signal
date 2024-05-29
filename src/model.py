@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 
-hidden_size = 300
+hidden_size = 250
 num_layers = 6
 
 # Model Definition
