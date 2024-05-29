@@ -1,0 +1,23 @@
+Hidden: 100 Layers: 3
+Train Loss: 0.4022, Val Loss: 0.4032
+Val Precision: 0.0189, Val Recall: 0.9485, Val F1 Score: 0.0371
+
+Hidden: 50 Layers: 1
+Train Loss: 0.4935, Val Loss: 0.4569
+Val Precision: 0.0182, Val Recall: 0.9097, Val F1 Score: 0.0356
+
+Hidden: 200 Layers: 2
+Train Loss: 0.4094, Val Loss: 0.3936
+Val Precision: 0.0213, Val Recall: 0.9272, Val F1 Score: 0.0417
+
+Hidden: 200 Layers: 3
+Train Loss: 0.3910, Val Loss: 0.3785
+Val Precision: 0.0217, Val Recall: 0.9367, Val F1 Score: 0.0424
+
+Hidden: 300 Layers: 2
+Train Loss: 0.4160, Val Loss: 0.4084
+Val Precision: 0.0235, Val Recall: 0.9034, Val F1 Score: 0.0457
+
+Hidden: 300 Layers: 3
+Train Loss: 0.3868, Val Loss: 0.3921
+Val Precision: 0.0233, Val Recall: 0.9184, Val F1 Score: 0.0454

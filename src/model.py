@@ -1,12 +1,12 @@
 import torch
 import torch.nn as nn
 
-hidden_size = 200
-num_layers = 2
+hidden_size = 300
+num_layers = 6
 
 # Model Definition
 class LSTMModel(nn.Module):
-    def __init__(self, input_size=1, output_size=1):
+    def __init__(self, input_size=2, output_size=1):
         super(LSTMModel, self).__init__()
         self.hidden_size = hidden_size
         self.num_layers = num_layers
