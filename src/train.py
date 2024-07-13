@@ -43,8 +43,8 @@ class SensorDataset(Dataset):
 train_dataset = SensorDataset(train_data, train_targets)
 val_dataset = SensorDataset(val_data, val_targets)
 
-train_dataloader = DataLoader(train_dataset, batch_size=32, shuffle=True)
-val_dataloader = DataLoader(val_dataset, batch_size=32, shuffle=False)
+train_dataloader = DataLoader(train_dataset, batch_size=64, shuffle=True)
+val_dataloader = DataLoader(val_dataset, batch_size=64, shuffle=False)
 
 model = LSTMModel().to(device)
 
